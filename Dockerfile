@@ -5,6 +5,7 @@ WORKDIR /app
 # Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN alembic upgrade head
 
 # Copy application code
 COPY . .
