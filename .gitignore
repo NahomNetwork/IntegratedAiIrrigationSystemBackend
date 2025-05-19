@@ -1,0 +1,90 @@
+# Node modules
+node_modules/
+
+# Build directories
+dist/
+build/
+
+# Log files
+logs/
+*.log
+
+# Environment variable files
+.env
+
+# Dependency directories
+.npm/
+bower_components/
+
+# Testing coverage
+coverage/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+#################################
+# Python specific ignores below #
+#################################
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheelhouse/
+pip-wheel-metadata/
+share/python-wheels/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# PyBuilder
+target/

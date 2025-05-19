@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import datetime
 
 
 class FeatureData(BaseModel):
@@ -34,5 +35,5 @@ class SensorDataRequest(BaseModel):
     Wind_speed_Kmh: float
     rainfall: float
     number_of_working_sensors: Optional[float]
-    received_at: Optional[str]
-    timestamp: Optional[str]
+    received_at: Optional[datetime]
+    timestamp: Optional[datetime]

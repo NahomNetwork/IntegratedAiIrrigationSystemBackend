@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_db
 from src.schema import SensorDataRequest
 from sqlalchemy.future import select
-from src.schema import PredictionResult, FeatureData
+from src.schema import FeatureData
 from sqlalchemy import text
 import numpy as np
 
@@ -14,61 +14,52 @@ import numpy as np
 system_router = APIRouter(prefix="/system")
 
 
-@system_router.post("/sensor_data", response_model=PredictionResult)
+@system_router.post("/sensor_data")
 async def receive_sensordata(
     req: SensorDataRequest, request: Request, db: AsyncSession = Depends(get_db)
 ):
-    sensor_data_dict = req.model_dump()
-    await sio.emit("sensor_data", sensor_data_dict)
+    try:
+        sensor_data_dict = req.model_dump()
 
-    # model prediction happens here
-    # needed data
-    # rainfall, Pressure_Kpa, Time
+        # model prediction happens here
+        # needed data
+        # rainfall, Pressure_Kpa, Time
 
-    features_raw = FeatureData(**sensor_data_dict)
+        features_raw = FeatureData(**sensor_data_dict)
 
-    model = request.app.state.model
-    if not model:
-        raise HTTPException(status_code=503, detail="Model not initialized")
+        model = request.app.state.model
+        if not model:
+            raise HTTPException(status_code=503, detail="Model not initialized")
 
-    features = np.array([list(features_raw.model_dump().values())])
-    prediction = model.predict(features)[0]
+        features = np.array([list(features_raw.model_dump().values())])
+        prediction = model.predict(features)[0]
 
-    non_working_sensors_data = sensor_data_dict.pop("Non_working_sensors", [])
-    db_item = SensorData(
-        **sensor_data_dict,
-        prediction=prediction,
-        non_working_sensors=[
-            NonWorkingSensor(sensor_name=item) for item in non_working_sensors_data
-        ],
-    )
+        print("Prediction:", prediction)
 
-    db.add(db_item)
-    await db.commit()
-    await db.refresh(db_item)
+        non_working_sensors_data = sensor_data_dict.pop("Non_working_sensors", [])
+        db_item = SensorData(
+            **sensor_data_dict,
+            prediction=prediction,
+            non_working_sensors=[
+                NonWorkingSensor(sensor_name=item) for item in non_working_sensors_data
+            ],
+        )
 
-    # engine = request.app.state.faiss_engine
-    # if not engine:
-    #     return HTTPException(status_code=503, detail="FAISS engine not initialized")
+        db.add(db_item)
+        await db.commit()
+        await db.refresh(db_item)
 
-    return {"results": db_item}
+        await sio.emit("sensor_data", db_item)
+
+        return {"results": db_item}
+    except Exception as e:
+        raise HTTPException(500, detail=e)
 
 
 @system_router.get("/get_sensordata")
 async def get_sensordata(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(SensorData).offset(0).limit(10))
     data = result.scalars().all()
-
-    return {"results": data}
-
-
-@system_router.get("/get_sensordata/{id}")
-async def get_sensordata_by_id(id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(SensorData).where(SensorData.id == id))
-    data = result.scalars().first()
-
-    if not data:
-        raise HTTPException(status_code=404, detail="Sensor data not found")
 
     return {"results": data}
 
@@ -86,9 +77,20 @@ async def get_last_sensordata(db: AsyncSession = Depends(get_db)):
     return {"results": data}
 
 
+@system_router.get("/get_sensordata/{id}")
+async def get_sensordata_by_id(id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(SensorData).where(SensorData.id == id))
+    data = result.scalars().first()
+
+    if not data:
+        raise HTTPException(status_code=404, detail="Sensor data not found")
+
+    return {"results": data}
+
+
 @system_router.delete("/sensordata/purge")
 async def purge_sensordata(db: AsyncSession = Depends(get_db)):
-    await db.execute(text("TRUNCATE TABLE sensordata"))
+    await db.execute(text("TRUNCATE TABLE sensordata CASCADE"))
     await db.commit()
     return {"message": "Sensor data purged successfully"}
 
