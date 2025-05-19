@@ -89,3 +89,4 @@ instance/
 # PyBuilder
 target/
 venv/
+.env
