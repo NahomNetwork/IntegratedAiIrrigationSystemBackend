@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 import os
 from alembic import context
 from dotenv import load_dotenv
+from src.models import SensorData, NonWorkingSensor
 from src.models import Base
 
 
@@ -14,7 +15,7 @@ load_dotenv()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-database_url = os.getenv("DATABASE_URL")
+database_url = os.getenv("DATABASE_URL", "")
 config = context.config
 
 config.set_main_option("sqlalchemy.url", database_url)
@@ -33,8 +34,6 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-
-print(Base.metadata, Base)
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
