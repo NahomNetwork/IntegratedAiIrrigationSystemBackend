@@ -13,4 +13,4 @@ COPY . .
 RUN alembic upgrade head
 
 # Start the FastAPI app with Gunicorn using Uvicorn worker
-CMD ["gunicorn", "main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "main:app", "-w", "2", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
