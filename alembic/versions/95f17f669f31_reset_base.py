@@ -1,8 +1,8 @@
-"""create sensordata table
+"""reset base
 
-Revision ID: 177edfdc974a
-Revises: f5af81fcafb9
-Create Date: 2025-05-14 20:26:38.463211
+Revision ID: 95f17f669f31
+Revises: 
+Create Date: 2025-05-19 13:38:09.262428
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '177edfdc974a'
-down_revision: Union[str, None] = 'f5af81fcafb9'
+revision: str = '95f17f669f31'
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
