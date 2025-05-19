@@ -24,7 +24,6 @@ mdurl==0.1.2
 pydantic==2.11.4
 pydantic_core==2.33.2
 Pygments==2.19.1
-python-dotenv==1.1.0
 python-engineio==4.12.1
 python-multipart==0.0.20
 python-socketio==5.13.0
@@ -47,3 +46,4 @@ scikit-learn
 numpy
 lightgbm
 gunicorn
+python-dotenv
