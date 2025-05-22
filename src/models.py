@@ -16,10 +16,8 @@ class SensorData(Base):
     prediction = Column(Integer)
     rainfall = Column(Float)
 
-    received_at = Column(DateTime(timezone=False), default=func.now())
-    timestamp = Column(
-        DateTime(timezone=False), default=func.now(), onupdate=func.now()
-    )
+    received_at = Column(DateTime(timezone=True), default=func.now())
+    timestamp = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
     non_working_sensors = relationship(
         "NonWorkingSensor", backref="sensordata", cascade="all, delete-orphan"

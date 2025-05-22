@@ -21,10 +21,6 @@ async def receive_sensordata(
     try:
         sensor_data_dict = req.model_dump()
 
-        # model prediction happens here
-        # needed data
-        # rainfall, Pressure_Kpa, Time
-
         features_raw = FeatureData(**sensor_data_dict)
 
         model = request.app.state.model
@@ -33,8 +29,6 @@ async def receive_sensordata(
 
         features = np.array([list(features_raw.model_dump().values())])
         prediction = model.predict(features)[0]
-
-        print("Prediction:", prediction)
 
         non_working_sensors_data = sensor_data_dict.pop("Non_working_sensors", [])
         db_item = SensorData(
