@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from src.models import SensorData, NonWorkingSensor
 from sqlalchemy import text
+from datetime import datetime
 
 
 async def get_sensordata(db: AsyncSession, offset: int = 0, limit: int = 10):
@@ -32,7 +33,9 @@ async def get_non_working_sensors(db: AsyncSession):
     return result.scalars().all()
 
 
-async def purge_sensordata_by_date(db: AsyncSession, start_date: str, end_date: str):
+async def purge_sensordata_by_date(
+    db: AsyncSession, start_date: datetime, end_date: datetime
+):
     await db.execute(
         text(
             "DELETE FROM sensordata WHERE received_at BETWEEN :start_date AND :end_date"

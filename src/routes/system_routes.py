@@ -99,24 +99,9 @@ async def purge_sensordata(
 
 @system_router.get("/non_working_sensors")
 async def get_non_working_sensors(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(NonWorkingSensor))
-    data = result.scalars().all()
+    result = await get_non_working_sensors_from_db(db)
 
-    return {"results": data}
-
-
-# @system_router.get("/sensordata/purge-by-date")
-# async def purge_sensordata_by_date(
-#     start_date: str, end_date: str, db: AsyncSession = Depends(get_db)
-# ):
-#     await db.execute(
-#         text(
-#             "DELETE FROM sensordata WHERE received_at BETWEEN :start_date AND :end_date"
-#         ),
-#         {"start_date": start_date, "end_date": end_date},
-#     )
-#     await db.commit()
-#     return {"message": "Sensor data purged successfully"}
+    return {"results": result}
 
 
 @system_router.get("/sensordata/purge-by-date")
@@ -140,13 +125,7 @@ async def purge_sensordata_by_date(
         )
 
     try:
-        await db.execute(
-            text(
-                "DELETE FROM sensordata WHERE received_at BETWEEN :start_date AND :end_date"
-            ),
-            {"start_date": start_dt, "end_date": end_dt},
-        )
-        await db.commit()
+        await purge_sensordata_by_date_from_db(db, start_dt, end_dt)
         return {"message": "Sensor data purged successfully"}
     except Exception as e:
         raise HTTPException(
