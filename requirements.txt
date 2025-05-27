@@ -42,8 +42,11 @@ uvicorn==0.34.2
 watchfiles==1.0.5
 websockets==15.0.1
 wsproto==1.2.0
+python-jose==3.4.0
+bcrypt==4.3.0
 scikit-learn
 numpy
 lightgbm
 gunicorn
 python-dotenv
+bcrypt
