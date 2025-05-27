@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Request, Depends
 from fastapi.exceptions import HTTPException
 from src.routes.socketio.route import sio
@@ -97,15 +98,43 @@ async def get_non_working_sensors(db: AsyncSession = Depends(get_db)):
     return {"results": data}
 
 
+# @system_router.get("/sensordata/purge-by-date")
+# async def purge_sensordata_by_date(
+#     start_date: str, end_date: str, db: AsyncSession = Depends(get_db)
+# ):
+#     await db.execute(
+#         text(
+#             "DELETE FROM sensordata WHERE received_at BETWEEN :start_date AND :end_date"
+#         ),
+#         {"start_date": start_date, "end_date": end_date},
+#     )
+#     await db.commit()
+#     return {"message": "Sensor data purged successfully"}
+
+
 @system_router.get("/sensordata/purge-by-date")
 async def purge_sensordata_by_date(
     start_date: str, end_date: str, db: AsyncSession = Depends(get_db)
 ):
-    await db.execute(
-        text(
-            "DELETE FROM sensordata WHERE received_at BETWEEN :start_date AND :end_date"
-        ),
-        {"start_date": start_date, "end_date": end_date},
-    )
-    await db.commit()
-    return {"message": "Sensor data purged successfully"}
+    """
+    Purge sensor data between start_date and end_date (inclusive).
+    Dates must be in ISO 8601 format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS.
+    """
+    try:
+        start_dt = datetime.fromisoformat(start_date)
+        end_dt = datetime.fromisoformat(end_date)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use ISO 8601 (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS).")
+
+    try:
+        await db.execute(
+            text(
+                "DELETE FROM sensordata WHERE received_at BETWEEN :start_date AND :end_date"
+            ),
+            {"start_date": start_dt, "end_date": end_dt},
+        )
+        await db.commit()
+        return {"message": "Sensor data purged successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error purging sensor data: {str(e)}")
+
