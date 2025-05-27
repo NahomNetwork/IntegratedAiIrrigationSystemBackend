@@ -1,7 +1,6 @@
 import pickle
 import os
 from sklearn.base import BaseEstimator
-from typing import Optional
 from pathlib import Path
 
 

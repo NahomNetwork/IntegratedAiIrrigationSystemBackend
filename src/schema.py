@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import datetime
 
@@ -37,3 +37,31 @@ class SensorDataRequest(BaseModel):
     number_of_working_sensors: Optional[float]
     received_at: Optional[datetime]
     timestamp: Optional[datetime]
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
+    first_name: str
+    last_name: Optional[str] = None
+
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    first_name: str
+    last_name: Optional[str] = None
+    is_active: bool
+    is_superuser: bool
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str

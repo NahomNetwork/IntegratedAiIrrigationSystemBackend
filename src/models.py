@@ -1,4 +1,13 @@
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Float, func
+from sqlalchemy import (
+    Column,
+    String,
+    Integer,
+    DateTime,
+    ForeignKey,
+    Float,
+    func,
+    Boolean,
+)
 from src.database import Base
 from sqlalchemy.orm import relationship
 
@@ -27,3 +36,13 @@ class SensorData(Base):
 class NonWorkingSensor(Base):
     sensor_name = Column(String, nullable=False)
     sensor_data_id = Column(Integer, ForeignKey("sensordata.id"))
+
+
+class User(Base):
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
