@@ -21,11 +21,7 @@ from src.services.sensor import (
 )
 
 
-system_router = APIRouter(
-    prefix="/system",
-    tags=["System Operations"],
-    dependencies=[Depends(get_current_user)],
-)
+system_router = APIRouter(prefix="/system", tags=["System Operations"])
 
 
 @system_router.post("/sensor_data")
@@ -63,14 +59,18 @@ async def receive_sensordata(
 
 
 @system_router.get("/get_sensordata")
-async def get_sensordata(db: AsyncSession = Depends(get_db)):
+async def get_sensordata(
+    db: AsyncSession = Depends(get_db), auth=Depends(get_current_user)
+):
     result = await get_sensordate_from_db(db)
 
     return {"results": result}
 
 
 @system_router.get("/get_sensordata/last")
-async def get_last_sensordata(db: AsyncSession = Depends(get_db)):
+async def get_last_sensordata(
+    db: AsyncSession = Depends(get_db), auth=Depends(get_current_user)
+):
     result = await get_last_sensordata_from_db(db)
 
     if not result:
@@ -80,7 +80,9 @@ async def get_last_sensordata(db: AsyncSession = Depends(get_db)):
 
 
 @system_router.get("/get_sensordata/{id}")
-async def get_sensordata_by_id(id: int, db: AsyncSession = Depends(get_db)):
+async def get_sensordata_by_id(
+    id: int, db: AsyncSession = Depends(get_db), auth=Depends(get_current_user)
+):
     result = await get_sensordata_by_id_from_db(db, id)
 
     if not result:
@@ -98,7 +100,9 @@ async def purge_sensordata(
 
 
 @system_router.get("/non_working_sensors")
-async def get_non_working_sensors(db: AsyncSession = Depends(get_db)):
+async def get_non_working_sensors(
+    db: AsyncSession = Depends(get_db), auth=Depends(get_current_user)
+):
     result = await get_non_working_sensors_from_db(db)
 
     return {"results": result}

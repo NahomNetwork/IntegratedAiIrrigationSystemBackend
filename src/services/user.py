@@ -43,6 +43,11 @@ async def create_user(db: AsyncSession, user_in: UserCreate):
     return user
 
 
+def verify_token(token: str):
+    payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
+    return payload
+
+
 async def get_current_user(
     token: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
     db: AsyncSession = Depends(get_db),
@@ -56,9 +61,9 @@ async def get_current_user(
     jwt_token = token.credentials
 
     try:
-        payload = jwt.decode(
-            jwt_token, config.SECRET_KEY, algorithms=[config.ALGORITHM]
-        )
+        payload = verify_token(jwt_token)
+        if not isinstance(payload, dict):
+            raise credentials_exception
         username = payload.get("sub")
         if username is None:
             raise credentials_exception
