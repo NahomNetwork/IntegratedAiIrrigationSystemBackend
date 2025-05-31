@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_db
 from src.schema import SensorDataRequest
 from src.schema import FeatureData
+from typing import Optional
 
 import numpy as np
 from src.services.user import get_current_user, get_admin_user
@@ -18,6 +19,7 @@ from src.services.sensor import (
     purge_sensordata as purge_sensordata_fro_db,
     get_non_working_sensors as get_non_working_sensors_from_db,
     purge_sensordata_by_date as purge_sensordata_by_date_from_db,
+    get_sensordata_by_date as get_sensordata_by_date_from_db,
 )
 
 
@@ -60,9 +62,35 @@ async def receive_sensordata(
 
 @system_router.get("/get_sensordata")
 async def get_sensordata(
-    db: AsyncSession = Depends(get_db), auth=Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    auth=Depends(get_current_user),
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    page: int = 1,
+    page_size: int = 10,
 ):
-    result = await get_sensordate_from_db(db)
+    """
+    Purge sensor data between start_date and end_date (inclusive).
+    Dates must be in ISO 8601 format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS.
+    """
+    if page < 1 or page_size < 1:
+        raise HTTPException(
+            status_code=400, detail="Page and page_size must be greater than 0"
+        )
+
+    offset = (page - 1) * page_size
+
+    if start_date and end_date:
+        result = await get_sensordata_by_date_from_db(
+            db, start_date, end_date, offset, page_size
+        )
+    elif start_date or end_date:
+        raise HTTPException(
+            status_code=400,
+            detail="Both start_date and end_date must be provided together.",
+        )
+    else:
+        result = await get_sensordate_from_db(db, offset, page_size)
 
     return {"results": result}
 
@@ -108,7 +136,7 @@ async def get_non_working_sensors(
     return {"results": result}
 
 
-@system_router.get("/sensordata/purge-by-date")
+@system_router.delete("/sensordata/purge-by-date")
 async def purge_sensordata_by_date(
     start_date: str,
     end_date: str,

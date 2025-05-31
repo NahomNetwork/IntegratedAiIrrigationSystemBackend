@@ -10,6 +10,22 @@ async def get_sensordata(db: AsyncSession, offset: int = 0, limit: int = 10):
     return result.scalars().all()
 
 
+async def get_sensordata_by_date(
+    db: AsyncSession,
+    start_date: datetime,
+    end_date: datetime,
+    offset: int = 0,
+    limit: int = 10,
+):
+    result = await db.execute(
+        select(SensorData)
+        .where(SensorData.received_at.between(start_date, end_date))
+        .offset(offset)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+
 async def get_last_sensordata(db: AsyncSession):
     result = await db.execute(
         select(SensorData).order_by(SensorData.id.desc()).limit(1)
