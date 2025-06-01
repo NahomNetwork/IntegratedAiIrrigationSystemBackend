@@ -81,9 +81,7 @@ async def get_sensordata(
     offset = (page - 1) * page_size
 
     if start_date and end_date:
-        result = await get_sensordata_by_date_from_db(
-            db, start_date, end_date, offset, page_size
-        )
+        result = await get_sensordata_by_date_from_db(db, start_date, end_date)
     elif start_date or end_date:
         raise HTTPException(
             status_code=400,

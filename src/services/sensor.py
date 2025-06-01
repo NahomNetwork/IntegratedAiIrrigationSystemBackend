@@ -11,17 +11,10 @@ async def get_sensordata(db: AsyncSession, offset: int = 0, limit: int = 10):
 
 
 async def get_sensordata_by_date(
-    db: AsyncSession,
-    start_date: datetime,
-    end_date: datetime,
-    offset: int = 0,
-    limit: int = 10,
+    db: AsyncSession, start_date: datetime, end_date: datetime
 ):
     result = await db.execute(
-        select(SensorData)
-        .where(SensorData.received_at.between(start_date, end_date))
-        .offset(offset)
-        .limit(limit)
+        select(SensorData).where(SensorData.received_at.between(start_date, end_date))
     )
     return result.scalars().all()
 
