@@ -5,9 +5,10 @@ from src.routes.socketio.route import sio
 from src.models import SensorData, NonWorkingSensor
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_db
-from src.schema import SensorDataRequest
+from src.schema import SensorDataRequest, SensorDataSchema
 from src.schema import FeatureData
 from typing import Optional
+
 
 import numpy as np
 from src.services.user import get_current_user, get_admin_user
@@ -51,13 +52,19 @@ async def receive_sensordata(
                 NonWorkingSensor(sensor_name=item) for item in non_working_sensors_data
             ],
         )
+
         result = await create_sensordata(db, db_item)
 
-        await sio.emit("sensor_data", result)
+        try:
+            await sio.emit(
+                "sensor_data", SensorDataSchema.model_validate(result).model_dump()
+            )
+        except Exception as e:
+            print(f"Error emitting sensor data: {e}")
 
         return {"results": db_item}
     except Exception as e:
-        raise HTTPException(500, detail=e)
+        raise HTTPException(500, detail=str(e))
 
 
 @system_router.get("/get_sensordata")

@@ -3,6 +3,35 @@ from typing import List, Optional
 from datetime import datetime
 
 
+class NonWorkingSensorSchema(BaseModel):
+    sensor_name: str
+    sensor_data_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class SensorDataSchema(BaseModel):
+    id: Optional[int] = None
+    Air_humidity_: Optional[float]
+    Air_temperature_C: Optional[float]
+    Pressure_KPa: Optional[float]
+    Soil_Humidity: Optional[float]
+    Soil_Moisture: Optional[float]
+    Temperature: Optional[float]
+    Time: Optional[float]
+    Wind_speed_Kmh: Optional[float]
+    number_of_working_sensors: Optional[float]
+    prediction: Optional[int]
+    rainfall: Optional[float]
+    received_at: Optional[datetime]
+    timestamp: Optional[datetime]
+    non_working_sensors: List[NonWorkingSensorSchema] = []
+
+    class Config:
+        orm_mode = True
+
+
 class FeatureData(BaseModel):
     Temperature: float
     Soil_Humidity: float
